@@ -4,7 +4,7 @@ const Journal = require('./journal');
 
 const userSchema = new Schema(
     {
-        fullName: { 
+        fullname: { 
             type: String,
         },
         username: { 

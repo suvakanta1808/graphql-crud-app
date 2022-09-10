@@ -2,7 +2,8 @@ const { gql } = require('apollo-server');
 
 const schema = gql`
     type User {
-        fullName: String
+        _id: ID!,
+        fullname: String
         username: String
         journals: [Journal]
     }
@@ -15,16 +16,34 @@ const schema = gql`
         dislikes: [User]
     }
 
-    type Query {
-        journals: [Journal]
+    type AuthData {
+        token: String
+        userId: String
     }
 
     input JournalInput {
         content: String!
     }
 
+    input UserAuthInput {
+        username: String
+        password: String
+    }
+
+    input UserSignUpInput {
+        username: String
+        fullname: String
+        password: String
+    }
+
+    type Query {
+        journals: [Journal]
+        login(authData: UserAuthInput!): AuthData!
+    }
+
     type Mutation {
         createJournal(input: JournalInput!): Journal!
+        signup(userAuthInput: UserSignUpInput!): User!
     }
 `;
 
