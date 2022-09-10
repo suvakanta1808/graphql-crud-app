@@ -3,6 +3,7 @@ const { ApolloServer } = require('apollo-server');
 
 const gqlSchema = require('./graphql/schema');
 const gqlResolvers = require('./graphql/resolvers');
+const connectDB = require('./db/connect');
 
 const server = new ApolloServer({
     typeDefs: gqlSchema,
@@ -15,7 +16,17 @@ const server = new ApolloServer({
         })
     ],
   });
+
+  async function startServer() {
+    try {
+        await connectDB();
+        server.listen().then(({ url }) => {
+            console.log(`🚀 Server ready at ${url}`);
+            });
+    } catch (error) {
+        console.log(error);
+    }
+  };
+
+  startServer();
   
-  server.listen().then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`);
-  });
