@@ -1,10 +1,21 @@
-const express = require('express');
-const app = express();
+const { ApolloServerPluginLandingPageLocalDefault } = require('apollo-server-core');
+const { ApolloServer } = require('apollo-server');
 
-app.use('/',(req, res, mid) => {
-    res.send({status: 200,msg: "Hello world!"});
-})
+const gqlSchema = require('./graphql/schema');
+const gqlResolvers = require('./graphql/resolvers');
 
-app.listen(3000,() => {
-    console.log('Server listening on 3000...');
-});
+const server = new ApolloServer({
+    typeDefs: gqlSchema,
+    resolvers: gqlResolvers,
+    csrfPrevention: true,
+    cache: 'bounded',
+    plugins: [
+        ApolloServerPluginLandingPageLocalDefault({  
+            embed: true
+        })
+    ],
+  });
+  
+  server.listen().then(({ url }) => {
+    console.log(`🚀  Server ready at ${url}`);
+  });
