@@ -20,8 +20,6 @@ const schema = gql`
     }
 
     input JournalInput {
-        authorId: String!
-        dop: String!
         content: String!
     }
 
