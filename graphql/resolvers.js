@@ -1,3 +1,5 @@
+const { Journal } = require('../models/journal');
+
 const dummy = [
     {
         journalId: '36498451',
@@ -21,7 +23,16 @@ const dummy = [
 
 const resolvers = {
     Query: {
-        journals: () => dummy
+        journals: async (_, {}) => {
+            return await Journal.find();
+        }
+    },
+    Mutation: {
+        createJournal: async (_, {input}, {models}) => {
+            var journal = new Journal(input);
+            await journal.save();
+            return journal;
+        }
     }
 }
 
