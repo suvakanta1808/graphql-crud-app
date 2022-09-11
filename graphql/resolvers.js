@@ -7,7 +7,20 @@ const { User } = require('../models/user');
 
 const resolvers = {
     Query: {
-        journals: async (_, {}) => {
+        journals: async (_, {}, context) => {
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            if(!decodedToken) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
             return await Journal.find();
         },
         login: async (_, {authData: {username, password}}) => {
@@ -57,15 +70,31 @@ const resolvers = {
             });
             return newUser;
         },
-        createJournal: async (_, {input: {content}}) => {
+        createJournal: async (_, {input: {content}}, context) => {
+            if(!context.token) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            const user = await User.findOne({ _id: decodedToken.userId });
             var journal = new Journal({
-                authorId: "ATH1234567",
+                authorId: decodedToken.userId,
                 content: content,
                 dop: new Date().toISOString(),
                 dislikes: [],
                 likes: []
             });
+            user.journals.push(journal);
             await journal.save();
+            await user.save();
             return journal;
         }
     }
