@@ -25,6 +25,11 @@ const schema = gql`
         content: String!
     }
 
+    input JournalUpdateInput {
+        id: ID!
+        content: String!
+    }
+
     input UserAuthInput {
         username: String
         password: String
@@ -39,11 +44,15 @@ const schema = gql`
     type Query {
         journals: [Journal]
         login(authData: UserAuthInput!): AuthData!
+        getJournal(id: ID!): Journal!
+        getUser(id: ID!): User!
     }
 
     type Mutation {
         createJournal(input: JournalInput!): Journal!
         signup(userAuthInput: UserSignUpInput!): User!
+        updateJournal(updateJournalInput: JournalUpdateInput!): Journal!
+        deleteJournal(id: ID!): Journal!
     }
 `;
 

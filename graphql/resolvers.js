@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const isAuth = require('../util/isAuth');
 require('dotenv').config();
 
 const { Journal } = require('../models/journal');
@@ -22,6 +23,38 @@ const resolvers = {
                 throw error;
             }
             return await Journal.find();
+        },
+        getJournal: async (_, { id }, context) => {
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            if(!decodedToken) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
+            return await Journal.findById(id);
+        },
+        getUser: async (_, { id }, context) => {
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            if(!decodedToken) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
+            return await User.findById(id).populate('journals');
         },
         login: async (_, {authData: {username, password}}) => {
             const user = await User.findOne({username: username});
@@ -94,6 +127,56 @@ const resolvers = {
             });
             user.journals.push(journal);
             await journal.save();
+            await user.save();
+            return journal;
+        },
+        updateJournal: async (_, {updateJournalInput: {id, content}}, context) => {
+            if(!context.token) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            const journal = await Journal.findById(id);
+            if(journal.authorId.toString() !== decodedToken.userId.toString()) {
+                const error = new Error('Not Authorized');
+                error.status = 401;
+                throw error;
+            }
+            journal.content = content;
+            await journal.save();
+            return journal;
+        },
+        deleteJournal: async (_, {id}, context) => {
+            if(!context.token) {
+                const error = new Error('Authentication headers are missing');
+                error.status = 422;
+                throw error;
+            }
+            var decodedToken;
+            try{
+                decodedToken = jwt.verify(context.token,process.env.JWT_SECRET);
+            } catch (err) {
+                const error = new Error('Not Authenticated');
+                error.status = 401;
+                throw error;
+            }
+            const journal = await Journal.findById(id);
+            if(journal.authorId.toString() !== decodedToken.userId.toString()) {
+                const error = new Error('Not Authorized');
+                error.status = 401;
+                throw error;
+            }
+            await Journal.findByIdAndDelete(id);
+            const user = await User.findById(journal.authorId);
+            user.journals.pull(id);
             await user.save();
             return journal;
         }
