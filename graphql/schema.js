@@ -12,8 +12,8 @@ const schema = gql`
         dop: String
         authorId: String
         content: String
-        likes: [User]
-        dislikes: [User]
+        likes: [String]
+        dislikes: [String]
     }
 
     type AuthData {
@@ -53,6 +53,8 @@ const schema = gql`
         signup(userAuthInput: UserSignUpInput!): User!
         updateJournal(updateJournalInput: JournalUpdateInput!): Journal!
         deleteJournal(id: ID!): Journal!
+        likeJournal(id: ID!): Journal!
+        dislikeJournal(id: ID!): Journal!
     }
 `;
 

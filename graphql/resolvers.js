@@ -93,6 +93,57 @@ const resolvers = {
             });
             return newUser;
         },
+        likeJournal: async (_, {id}, context) => {
+            const userData = isAuth(context);
+            const journal = await Journal.findById(id).populate('likes').populate('dislikes');;
+            if(!journal) {
+                const error = new Error('Journal doesn\'t exist');
+                error.status = 404;
+                throw error;
+            }
+            const user = await User.findById(userData.userId);
+            if(!user) {
+                const error = new Error('User doesn\'t exist');
+                error.status = 422;
+                throw error;
+
+            }
+            if(journal.likes.includes(userData.userId)) {
+               journal.likes.pull(userData.userId);
+            } else {
+                if(journal.dislikes.includes(userData.userId)) {
+                    journal.dislikes.pull(userData.userId);
+                }
+                journal.likes.push(userData.userId);
+            }
+            await journal.save();
+            return journal;
+        },
+        dislikeJournal: async (_, {id}, context) => {
+            const userData = isAuth(context);
+            const journal = await Journal.findById(id).populate('likes').populate('dislikes');
+            if(!journal) {
+                const error = new Error('Journal doesn\'t exist');
+                error.status = 404;
+                throw error;
+            }
+            const user = await User.findById(userData.userId);
+            if(!user) {
+                const error = new Error('User doesn\'t exist');
+                error.status = 422;
+                throw error;
+            }
+            if(journal.dislikes.includes(userData.userId)) {
+                journal.dislikes.pull(userData.userId);
+            } else {
+                if(journal.likes.includes(userData.userId)) {
+                    journal.likes.pull(userData.userId);
+                }
+                journal.dislikes.push(userData.userId);
+            }
+            await journal.save();
+            return journal;
+        },
         createJournal: async (_, {input: {content}}, context) => {
             // if(!context.token) {
             //     const error = new Error('Authentication headers are missing');

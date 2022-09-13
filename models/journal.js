@@ -16,12 +16,10 @@ const journalSchema = new Schema(
             required: [true, "content can't be empty"]
         },
         likes: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            type: String,
         }],
         dislikes:  [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            type: String,
         }]
     }
 );
