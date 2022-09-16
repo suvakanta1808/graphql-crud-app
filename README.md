@@ -1,6 +1,6 @@
 ## simple-crud-api
 
-A psimple crud api.
+A simple crud api.
 
 
 ### Tech stack
