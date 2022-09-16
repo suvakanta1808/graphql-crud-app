@@ -1,11 +1,19 @@
 const { ApolloServerPluginLandingPageLocalDefault } = require('apollo-server-core');
 const { ApolloServer } = require('apollo-server');
-const jwt = require('jsonwebtoken');
+const { EnvelopArmor } = require('@escape.tech/graphql-armor');
 require('dotenv').config();
 
 const gqlSchema = require('./graphql/schema');
 const gqlResolvers = require('./graphql/resolvers');
 const connectDB = require('./db/connect');
+
+const armor = new EnvelopArmor({
+   blockFieldSuggestion: {
+        enabled: true,
+   }
+});
+
+const { plugins } = armor.protect();
 
 const server = new ApolloServer({
     typeDefs: gqlSchema,
@@ -19,6 +27,7 @@ const server = new ApolloServer({
         return { token: token };
     },
     plugins: [
+        ...plugins,
         ApolloServerPluginLandingPageLocalDefault({  
             embed: true
         })
