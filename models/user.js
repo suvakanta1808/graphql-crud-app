@@ -18,6 +18,10 @@ const userSchema = new Schema(
         journals: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Journal'
+        }],
+        savedJournals: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Journal'
         }]
     }
 );

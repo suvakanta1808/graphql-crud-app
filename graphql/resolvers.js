@@ -223,6 +223,42 @@ const resolvers = {
             user.journals.pull(id);
             await user.save();
             return journal;
+        },
+        saveJournal: async (_, {id}, context) => {
+            const userData = isAuth(context);
+            const journal = await Journal.findById(id);
+            if(!journal) {
+                const error = new Error('Journal doesn\'t exist');
+                error.status = 404;
+                throw error;
+            }
+            const user = await User.findById(userData.userId);
+            if(!user) {
+                const error = new Error('User doesn\'t exist');
+                error.status = 422;
+                throw error;
+            }
+            user.savedJournals.push(id);
+            await user.save();
+            return user;
+        },
+        unsaveJournal: async (_, {id}, context) => {
+            const userData = isAuth(context);
+            const journal = await Journal.findById(id);
+            if(!journal) {
+                const error = new Error('Journal doesn\'t exist');
+                error.status = 404;
+                throw error;
+            }
+            const user = await User.findById(userData.userId);
+            if(!user) {
+                const error = new Error('User doesn\'t exist');
+                error.status = 422;
+                throw error;
+            }
+            user.savedJournals.pull(id);
+            await user.save();
+            return user;
         }
     }
 }

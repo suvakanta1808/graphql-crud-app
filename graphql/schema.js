@@ -6,6 +6,7 @@ const schema = gql`
         fullname: String
         username: String
         journals: [Journal]
+        savedJournals: [Journal]
     }
 
     type Journal {
@@ -55,6 +56,8 @@ const schema = gql`
         deleteJournal(id: ID!): Journal!
         likeJournal(id: ID!): Journal!
         dislikeJournal(id: ID!): Journal!
+        saveJournal(id: ID!): User!
+        unsaveJournal(id: ID!): User!
     }
 `;
 
