@@ -34,28 +34,16 @@ const server = new ApolloServer({
     ],
   });
 
-    connectDB().then(() => {
-        console.log("MongoDB Connected");
-        return server.listen({port: process.env.PORT || 4000});
-    })
-    .then((res) => {
-        console.log(`Server running at ${res.url}`)
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-    
+const startServer = async () => {
+    try {
+        await connectDB(process.env.DB_CONNECT_URI);
+        server.listen({port: process.env.PORT || 4000}).then(({ url }) => {
+            console.log(`🚀 Server ready at ${url}`);
+            });
+    } catch (error) {
+        console.log(error);
+    }
+  };
 
-//   async function startServer() {
-//     try {
-//         await connectDB();
-//         server.listen({port: process.env.PORT || 4000}).then(({ url }) => {
-//             console.log(`🚀 Server ready at ${url}`);
-//             });
-//     } catch (error) {
-//         console.log(error);
-//     }
-//   };
-
-//   startServer();
+  startServer();
   
