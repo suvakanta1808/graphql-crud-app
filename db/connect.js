@@ -9,7 +9,7 @@ const connectDB = (url) => {
         },
         err => {
             if(err) {
-                console.error('Connection to DB failed');
+                console.error('Connection to DB failed', err);
             } else {
                 console.log('Connected to DB');
             }
