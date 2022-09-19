@@ -37,6 +37,7 @@ const server = new ApolloServer({
 const startServer = async () => {
     try {
         await connectDB(process.env.DB_CONNECT_URI);
+        console.log(typeof(process.env.DB_CONNECT_URI));
         server.listen({port: process.env.PORT || 4000}).then(({ url }) => {
             console.log(`🚀 Server ready at ${url}`);
             });
